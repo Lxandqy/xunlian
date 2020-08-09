@@ -1,0 +1,55 @@
+/*利用h[x]表示的是 x - lowbit(x) - x之间； 来设置改变函数；
+查询设置就是如果 y - lowbit(y) >= x;那就ans = max(ans,h[y])(因为h[x]表示的是y - lowbit(y)的最大值；
+否则y--遍历；*/
+
+#include<iostream>
+using namespace std;
+int n,m;
+int h[300005],a[300005];
+int lowbit(int x){
+	return x & (-x);
+}
+void change(int x){
+	int lx,i;
+	while(x <= n){
+		h[x] = a[x];
+		lx = lowbit(x);
+		for(int i = 1; i < lx; i <<= 1){
+			h[x] = max(h[x],h[x - i]);
+		}
+		x += lx;
+	}
+}
+int query(int x,int y){
+	int ans = 0;
+	while(y >= x){
+		ans = max(a[y],ans);
+		y--;
+		for(;y - lowbit(y) >= x; y -= lowbit(y)){
+			ans = max(h[y],ans);
+		}
+	}
+	return ans;
+}
+int main(){
+	char b;int x,y;
+	while(~scanf("%d%d",&n,&m)){
+		for(int i = 1; i <= n; i++){
+			h[i] = 0;
+		}
+		for(int i = 1; i <= n; i++){
+			scanf("%d",&a[i]);
+			change(i);
+		}
+		for(int i = 1; i <= m; i++){
+			scanf(" %c%d%d",&b,&x,&y);
+			if(b == 'Q'){
+				printf("%d\n",query(x,y));
+			}else{
+				a[x] = y;
+				change(x);
+			}
+		}
+	}
+	return 0;
+}
