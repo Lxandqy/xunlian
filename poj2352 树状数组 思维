@@ -1,0 +1,41 @@
+/*大意就是同行往下，同列往左的星星有多少就几级，输出每一级星星的个数*/
+/*由题意已知是y标从小到大 y标相同的时候 x标从左往右
+所以这个点的之前的点肯定是都在这个点下面  所以只要找到这个点左边的点就好了 所以使用树状数组*/
+#include<iostream>
+#include<vector>
+#include<cmath> 
+using namespace std;
+int a[15005 * 4],ans[15005];
+int lowbit(int x){
+	return x & -x;
+}
+void add(int x,int k){
+	while(x <= 32001){
+		a[x] += k;
+		x = x + lowbit(x);
+	}
+}
+int query(int x){
+	int ans = 0;
+	while(x){
+		ans += a[x];
+		x -= lowbit(x);
+	}
+	return ans;
+}
+int main(){
+	int n;
+	cin >> n;
+	int x,y;
+	for(int i = 1; i <= n; i++){
+		cin >> x >> y;
+		x++;
+		int t = query(x);
+		ans[t]++;
+		add(x,1);
+	}
+	for(int i = 0; i < n; i++){
+		cout << ans[i] << endl;
+	}
+	return 0;
+}
