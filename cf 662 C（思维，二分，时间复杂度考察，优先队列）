@@ -1,0 +1,73 @@
+//题目大致意思就是一样的数最大间隔距离是多少
+
+//首先说一下这道题的失误我是没有想出来的，只知道这个思路而且复杂度也判断错误了；
+//大致思路是想到了但是利用queue重复利用这个数我是没想到的
+
+#include<bits/stdc++.h> 
+using namespace std;
+int n;
+struct node{
+	int x,y;
+	friend bool operator < (node n1,node n2){
+		return n1.x < n2.x;
+	}
+};
+int a[100005] = {};
+int b[100005] = {};
+int cnt[100005] = {};
+bool check(int mid){
+	fill(b + 1,b + n + 1,0);
+	priority_queue<node>q;
+	for(int i = 1; i <= n; i++){
+		if(cnt[i]){
+			q.push({cnt[i],i});
+		}
+	}
+	for(int i = 1; i <= n; i++){
+		if(i > mid + 1 && cnt[b[i - mid - 1]]){
+			q.push({cnt[b[i - mid - 1]],b[i - mid - 1]});
+		}//如果b[i - mid - 1]这个数出现的次数没有用完，继续用； 
+		if(q.empty()){
+			return false;
+		}//所有都用完了 那就错了 
+		node s = q.top();
+		q.pop();
+		cnt[s.y]--;//用掉这个数的一次出现机会 
+		b[i] = s.y;//记录用掉这个数 
+	}
+	return true;
+}
+void clear(){
+	fill(cnt + 1,cnt + n + 1,0);
+	for(int i = 1; i <= n; i++){
+		cnt[a[i]]++;
+	}//还原原数组，，主要就是这里复杂度判断错误，以为很大
+}
+int main(){
+	int t;
+	cin >> t;
+	
+	while(t--){
+		cin >> n;
+		memset(cnt,0,sizeof cnt);
+		memset(b,0,sizeof b);
+		int x;
+		for(int i = 1; i <= n; i++){
+			scanf("%d",&a[i]);
+			cnt[a[i]]++;
+		}
+		int l = 0,r = 1e5;
+		while(l + 1 < r){
+			int mid = (l + r) >> 1;
+			clear();
+			if(check(mid)){
+				l = mid;
+			}else r = mid;
+		}
+		if(check(r)){
+			cout << r << endl;
+		}else cout << l << endl;
+	}
+	
+	return 0;
+}
