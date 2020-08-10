@@ -1,0 +1,45 @@
+#include<iostream>
+using namespace std;
+int main(){
+	int n;
+	cin >> n;
+	int a;
+	int b[100005] = {};
+	int flag[5] = {};
+	for(int i = 1; i <= n; i++){
+		cin >> a;
+		b[a]++;
+		if(b[a] % 4 == 0 && b[a] >= 4){
+			flag[4]++;
+			flag[2]--;
+		}else if(b[a] % 2 == 0 && b[a] >= 2){
+			flag[2]++;
+		}
+	}
+	int m;
+	cin >> m;
+	char x;int y;
+	for(int i = 1; i <= m; i++){
+		cin >> x >> y;
+		if(x == '+'){
+			b[y]++;
+			if(b[y] % 4 == 0 && b[y] >= 4){
+				flag[4]++;
+				flag[2]--;
+			}else if(b[y] % 2 == 0 && b[y] >= 2){
+				flag[2]++;
+			}
+		}else{
+			b[y]--;
+			if((b[y] + 1) % 4 == 0 && b[y] + 1 >= 4){
+				flag[4]--;
+				flag[2]++;
+			}else if((b[y] + 1) % 2 == 0 && b[y] + 1 >= 2){
+				flag[2]--;
+			}
+		}
+		if(flag[4] >= 2 || (flag[4] >= 1 && flag[2] >= 2)) cout << "YES" << endl;
+		else cout << "NO" << endl;
+	}
+	return 0;
+}
