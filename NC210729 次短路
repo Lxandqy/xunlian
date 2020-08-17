@@ -1,0 +1,44 @@
+#include<bits/stdc++.h>
+using namespace std;
+const int maxn=100010;
+const int inf=0x3f3f3f3f3f;
+typedef pair<int,int> pii;
+vector<pii> g[maxn];
+int n,m;
+int dis1[maxn],dis2[maxn];
+void dijkstra(int u){
+	priority_queue<pii,vector<pii>,greater<pii> > q;
+	for(int i=0;i<n;i++){
+		dis1[i]=dis2[i]=inf;
+	}
+	dis1[u]=0;
+	q.push({dis1[u],u});
+	while(!q.empty()){
+		pii now=q.top();
+		q.pop();
+		int u=now.second,d=now.first;
+		for(auto i:g[u]){
+			int v=i.first,w=i.second;
+			if(dis1[v]>d+w){
+				dis2[v]=dis1[v];
+				dis1[v]=d+w;
+				q.push({dis1[v],v});
+			}else if(dis2[v]>d+w&&dis1[v]<d+w){
+				dis2[v]=d+w;
+				q.push({dis2[v],v});
+			}
+		}
+	}
+} 
+int main(){
+	cin>>n>>m;
+	for(int i=1;i<=m;i++){
+		int u,v,w;
+		cin>>u>>v>>w;
+		g[u].push_back({v,w});
+		g[v].push_back({u,w});
+	}
+	dijkstra(0);
+	cout<<dis2[n-1]<<endl;
+	return 0;
+}
