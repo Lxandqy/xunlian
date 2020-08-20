@@ -1,0 +1,49 @@
+#include<iostream>
+#include<cstdio>
+#include<map>
+using namespace std;
+typedef long long ll;
+map<ll,int>m;
+int main(){
+	int n,s;
+	scanf("%d%d",&n,&s);
+	int x,y;
+	ll a[50] = {}; //记录每个点之间的链接情况
+	for(int i = 0; i < n; i++) a[i] = (1ll << i);
+	for(int i = 1; i <= s; i++){
+		scanf("%d%d",&x,&y);
+		--x,--y;
+		a[x] |= (1ll << y);
+		a[y] |= (1ll << x);
+	}
+	for(int i = 0; i < (1 << (n / 2)); i++){
+		int cnt = 0;
+		ll t = 0;
+		for(int j = 0; j < n / 2; j++){
+			if((i >> j) & 1){
+				t ^= a[j]; //记录按压这个点之后的情况
+				++cnt;
+			}
+		}
+		if(!m.count(t)){  //记录最小的情况
+			m[t] = cnt;
+		}else{
+			m[t] = min(m[t],cnt);
+		}
+	}
+	int ans = 0x3f3f3f;
+	for(int i = 0; i < (1 << (n - n / 2)); i++){
+		int cnt = 0;
+		ll t = 0;
+		for(int j = 0; j < n - n  / 2; j++){
+			if((i >> j) & 1){
+				t ^= a[n / 2 + j]; 
+				++cnt;
+			}
+		}
+		if (m.count(((1ll << n) - 1) ^ t)) //（1ll << n) - 1 就是关于n位的全1情况 ^ t 就是 t的1位变0 0位变1 如果有这另一半已经记录那就 记录最小的
+    ans = min(ans, cnt + m[((1ll << n) - 1) ^ t]);
+	}
+	printf("%d\n",ans);
+	return 0;
+}
