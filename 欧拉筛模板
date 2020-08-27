@@ -1,0 +1,28 @@
+bool vis[maxN];
+int prime[maxN],cnt;
+
+void init()
+{
+    memset(vis,false, sizeof(vis));//所有数初始化为0->质数
+    vis[0]=true;
+    vis[1]=true;
+    cnt=0;
+}
+
+void Is_Prime()
+{
+    init();
+    for(int i=2;i<=N;i++)
+    {
+        if(!vis[i])//i是质数
+            prime[++cnt]=i;//prime是用来存质数的数组，显然数组中的质数是从小到大
+        for(int j=1;j<=cnt;j++)
+        {
+            if(i*prime[j]>N)//超出了范围
+                break;
+            vis[i*prime[j]]=true;
+            if(i % prime[j] == 0)//跑到了i的最小的质因数
+                break;
+        }
+    }
+}
