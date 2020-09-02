@@ -1,0 +1,62 @@
+#include<iostream>
+#include<cstdio>
+using namespace std;
+typedef long long ll;
+const int p = 1e9 + 7;
+ll b[999][999],a[999][999],dx[999][999];
+void a_a(int n){
+	for(int i = 1; i <= n; i++){
+		for(int j = 1; j <= n; j++){
+			dx[i][j] = a[i][j],a[i][j] = 0;
+		}
+	}
+	for(int i = 1; i <= n; i++){
+		for(int j = 1; j <= n; j++){
+			for(int k = 1; k <= n; k++){
+				a[i][j] = (a[i][j] + (b[i][k] * dx[k][j]) % p) % p;
+			}
+		}
+	}
+}
+void b_b(int n){
+	for(int i = 1; i <= n; i++){
+		for(int j = 1; j <= n; j++){
+			dx[i][j] = b[i][j],b[i][j] = 0;
+		}
+	}
+	for(int i = 1; i <= n; i++){
+		for(int j = 1; j <= n; j++){
+			for(int k = 1; k <= n; k++){
+				b[i][j] = (b[i][j] + (dx[i][k] * dx[k][j]) % p) % p;
+			}
+		}
+	}
+	
+}
+void kuaisumi(ll x,ll y){
+	while(y){
+		if(y & 1){
+			a_a(x);
+		}
+		y /= 2;
+		b_b(x);
+	}
+}
+int main(){
+	ll n,k;
+	cin >> n >> k;
+	for(int i = 1; i <= n; i++){
+		for(int j = 1; j <= n; j++){
+			cin >> a[i][j];
+			b[i][j] = a[i][j];
+		}
+	}
+	kuaisumi(n,k - 1);
+	for(int i = 1; i <= n; i++){
+		for(int j = 1; j <= n; j++){
+			cout << a[i][j] % p << " ";
+		}
+		puts(" ");
+	}
+	return 0;
+} 
