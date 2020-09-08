@@ -1,0 +1,90 @@
+#include<cstdio>
+#include<cstring>
+#include<queue>
+using namespace std;
+typedef long long ll;
+struct node{
+	int to,last;
+	ll w;
+}a[100005];
+	int n,m,s,t;
+int flag[2005][2005];
+int cnt = 1;
+int head[100005];
+void add(int u,int v,ll w){
+	a[++cnt].to = v;
+	a[cnt].w = w;
+	a[cnt].last = head[u];
+	head[u] = cnt;
+}
+int  d[100005];
+int bfs(){
+	memset(d,0,sizeof d);
+	queue<int>q;
+	q.push(s);
+	d[s] = 1;
+	while(q.size()){
+		int p = q.front();
+		q.pop();
+		for(int i = head[p];i;i = a[i].last){
+			int v = a[i].to;
+			if(a[i].w > 0 && d[v] == 0){
+				d[v] = d[p] + 1;
+				q.push(v);
+				if(v == t) return 1;
+			}
+		}
+	}
+	if(d[t] == 0) return 0;
+	return 1;
+}
+int cur[100005];
+ll dfs(int x,ll sum){
+	if(x == t) return sum;
+	ll used = 0;
+	for(int i = cur[x]; i; i = a[i].last){
+		cur[x] = i;
+		/*对于一个节点xx，当它在DFSDFS中走到了第ii条弧时，前i-1i?1条弧到汇点的流一定已经被流满而没有可行的路线了
+
+那么当下一次再访问xx节点时，前i-1i?1条弧就没有任何意义了
+
+所以我们可以在每次枚举节点xx所连的弧时，改变枚举的起点，这样就可以删除起点以前的所有弧，来达到优化剪枝的效果
+
+对应到代码中，就是cur数组*/
+		if(d[a[i].to] == d[x] + 1 && a[i].w > 0){
+			ll dd = dfs(a[i].to,min(sum - used,a[i].w));
+			a[i].w -= dd;
+			a[i ^ 1].w += dd;
+			used += dd;
+			if(used == sum) break; 
+		}
+	}
+	if(used == 0) d[x] = -1;
+	return used;
+}
+ll dinic(){
+	ll ans = 0;
+	while(bfs()){
+		for(int i = 0; i < cnt; i++){
+			cur[i] = head[i];
+		}
+		ans += dfs(s,1e18);
+	}
+	return ans;
+}
+int main(){
+	scanf("%d%d%d%d",&n,&m,&s,&t);
+	int x,y,w;
+	for(int i = 1; i <= m; i++){
+		scanf("%d%d%d",&x,&y,&w);
+		if(!flag[x][y]){
+			add(x,y,w);
+		    add(y,x,0);
+			flag[x][y] = cnt;
+		}else{
+			a[flag[x][y] - 1].w += w;
+		}
+	}
+	printf("%lld\n",dinic());
+	return 0; 
+} 
