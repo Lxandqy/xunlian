@@ -1,0 +1,39 @@
+#include<iostream>
+using namespace std;
+const int maxn = 100010;
+int son[maxn][26],cnt[maxn],idx;
+void insert(char ch[]){
+    int p = 0;
+    for(int i = 0; ch[i]; i++){
+        int s = ch[i] - 'a';
+        if(!son[p][s]) son[p][s] = ++idx;
+        p = son[p][s];
+    }
+    cnt[p]++;
+    return;
+}
+int query(char ch[]){
+    int p = 0;
+    for(int i = 0; ch[i]; i++){
+        int s = ch[i] - 'a';
+        if(!son[p][s]) return 0;
+        p = son[p][s];
+    }
+    return cnt[p];
+}
+
+int main(){
+    int t;
+    cin >> t;
+    char a, ch[maxn];
+    while(t--){
+        cin >> a >> ch;
+        if(a == 'I'){
+            insert(ch);
+        }else{
+            cout << query(ch) << endl;
+        }
+    }
+    
+    return 0;
+}
