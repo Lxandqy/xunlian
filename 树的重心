@@ -1,0 +1,40 @@
+#include<iostream>
+#include<cstring>
+using namespace std;
+const int maxn = 1e5 + 5;
+int n;
+int head[maxn],w[maxn * 2],last[maxn * 2],cnt;
+void add(int x,int y){
+    w[++cnt] = y;
+    last[cnt] = head[x];
+    head[x] = cnt;
+}
+bool st[maxn];
+int ans = maxn;
+int dfs(int x){
+    st[x] = true;
+    int sum = 1;
+    int res = 0;
+    for(int i = head[x]; i != -1; i = last[i]){
+        if(!st[w[i]]){
+            int s = dfs(w[i]);
+            res = max(s,res);
+            sum += s;
+        }
+    }
+    ans = min(ans,max(n - sum,res));
+    return sum;
+}
+int main(){
+    cin >> n;
+    int x,y;
+    memset(st,false,sizeof st);
+    memset(head,-1,sizeof head);
+    for(int i = 1; i <= n - 1; i++){
+        cin >> x >> y;
+        add(x,y),add(y,x);
+    }
+    dfs(1);
+    cout << ans << endl;
+    return 0;
+}
