@@ -1,0 +1,47 @@
+#include<iostream>
+#include<queue>
+#include<unordered_map>
+using namespace std;
+string b = "";
+int xx[4] = {1,0,-1,0};
+int yy[4] = {0,1,0,-1};
+int bfs(){
+    string end = "12345678x";
+    queue<string>q;
+    q.push(b);
+    unordered_map<string, int> d;
+    d[b] = 0;
+    while(q.size()){
+        string c = q.front();
+        q.pop();
+        if(c == end) return d[end];
+        int k = c.find('x');
+        int dis = d[c];
+        int x = k / 3,y = k % 3;
+        for(int i = 0; i < 4; i++){
+            int a = x + xx[i],b = y + yy[i];
+            if(a >= 0 && a < 3 && b >= 0 && b < 3){
+                swap(c[k],c[a * 3 + b]);
+                if(!d.count(c)){
+                    d[c] = dis + 1;
+                    q.push(c);
+                }
+                swap(c[k],c[a * 3 + b]);
+            }
+        }
+    }
+    return -1;
+}
+int main(){
+    char a;
+    for(int i = 0; i < 9; i++){
+        cin >> a;
+        b += a;
+    }
+    cout << bfs() << endl;
+    
+    
+    
+    
+    return 0;
+}
