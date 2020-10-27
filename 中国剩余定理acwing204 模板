@@ -1,0 +1,52 @@
+x1 mod a1 = m1;
+x2 mod a2 = m2;
+x1 -a1 * k1 = m1,x2 - a2 * k2 = m2;
+a1 k1 - a2 k2 = m1 - m2;
+a1 k1 + (-a2) k2 = m1 - m2;
+欧几里得扩展 gcd = exgcd(a1,a2,k1,k2);
+若要最小则 k1 = k1 * (m1 - m2) / gcd % a2 / gcd; 最小公倍数 a2 因子;
+求出k1,k2 已知 公式 k1 = k1 + k (a2 / gcd), k2 = k2 + k (a1 / gcd);
+将公式带入x1 - a1 k1 = m1;
+x1 - a1(k1 + k (a2 / gcd) = m1;
+x1 = a1 k1 + m1 + k (a2 / gcd);
+此时设又变成了原来的模式
+x1 = a1 k1 + m0；
+m0 = k(a2 / gcd) + m1;
+回到最初的一步继续
+
+
+#include<iostream>
+using namespace std;
+typedef long long ll;
+ll exgcd(ll a,ll b,ll &x,ll &y){
+    if(!b){
+        x = 1,y = 0;
+        return a;
+    }
+    ll x1,y1;
+    ll gcd = exgcd(b,a % b,x1,y1);
+    x = y1,y = x1 - (a / b ) * y1;
+    return gcd;
+}
+int main(){
+    int n;
+    cin >> n;
+    ll a1,m1;
+    cin >> a1 >> m1;
+    bool flag = true;
+    for(int i = 1; i < n; i++){
+        ll k1,k2,a2,m2;
+        cin >> a2 >> m2;
+        ll gcd = exgcd(a1,-a2,k1,k2);
+        if((m2 - m1) % gcd){
+            flag = false;
+            break;
+        }
+        k1 = ((k1 * (m2 - m1) / gcd) % abs (a2 / gcd) + abs(a2 / gcd)) % abs(a2 / gcd);
+        m1 = m1 + k1 * a1;
+        a1 = abs(a1 / gcd * a2);
+    }
+    if(flag) cout <<  m1 << endl;
+    else cout << -1 << endl;
+    return 0;
+}
