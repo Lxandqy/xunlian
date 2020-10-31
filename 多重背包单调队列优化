@@ -1,0 +1,43 @@
+/*
+设n为物体个数,m为背包的总体积
+v[maxn] 为物体体积,w[maxn]为背包增加的,s[maxn]为物体的个数
+首先的思想就是 f[i] = max(f[i],f[m - k * v[i]] + k * w[i]); //式子①
+这是最基础的背包形式
+设 d = v[i] , a =  m / v[i] , b = m % v[i];
+m = d * a + b;
+代入式子①就是
+f[i] = max(f[d * a + b - k * v[i]] + k * w[i]);
+f[i] = max(f[(a - k) * v[i]] + k * w[i]);
+设K = a - k;
+f[i] = max(f[K * v[i]] + - K * w[i]) + a * w[i];
+所以我们只需要找 f[K * v[i]] + - K * w[i] 的最大值加上w[i]
+此时我们就想到了单调队列；
+
+*/
+#include<iostream>
+#include<cstring>
+using namespace std;
+const int maxn = 1005;
+const int maxm = 20005;
+int main(){
+    int n,m,v[maxn],w[maxn],s[maxn],q[maxm],dp[maxm] = {},g[maxm] = {};
+    cin >> n >> m;
+    for(int i = 1; i <= n; i++){
+        cin >> v[i] >> w[i] >> s[i];
+    }
+    for(int i = 1; i <= n; i++){
+    	memcpy(g,dp,sizeof dp);
+    	int d = m / v[i],b = m % v[i];
+    	for(int j = 0; j < v[i]; j++){//枚举余数
+    		int hh = 0,tt = -1;
+    		for(int k = j; k <= m; k += v[i]){
+    			while(hh <= tt && k - s[i] * v[i] > q[hh]) ++hh; //hh为队头 如果比队头大 那就把队头给弹出去
+    			if(hh <= tt) dp[k] = max(dp[k],g[q[hh]] + (k - q[hh]) / v[i] * w[i]);
+    			while(hh <= tt && g[q[tt]] - (q[tt] - j) / v[i] * w[i] <= g[k] - (k - j) / v[i] * w[i]) --tt;
+    			q[++tt] = k;
+			}
+		}
+    }
+    cout << dp[m] << endl;
+    return 0;
+}
