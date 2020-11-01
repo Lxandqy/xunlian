@@ -10,7 +10,7 @@ f[i] = max(f[d * a + b - k * v[i]] + k * w[i]);
 f[i] = max(f[(a - k) * v[i]] + k * w[i]);
 设K = a - k;
 f[i] = max(f[K * v[i]] + - K * w[i]) + a * w[i];
-所以我们只需要找 f[K * v[i]] + - K * w[i] 的最大值加上w[i]
+所以我们只需要找 f[K * v[i]] + - K * w[i]] 的最大值加上w[i]
 此时我们就想到了单调队列；
 
 */
@@ -31,9 +31,9 @@ int main(){
     	for(int j = 0; j < v[i]; j++){//枚举余数
     		int hh = 0,tt = -1;
     		for(int k = j; k <= m; k += v[i]){
-    			while(hh <= tt && k - s[i] * v[i] > q[hh]) ++hh; //hh为队头 如果比队头大 那就把队头给弹出去
-    			if(hh <= tt) dp[k] = max(dp[k],g[q[hh]] + (k - q[hh]) / v[i] * w[i]);
-    			while(hh <= tt && g[q[tt]] - (q[tt] - j) / v[i] * w[i] <= g[k] - (k - j) / v[i] * w[i]) --tt;
+    			while(hh <= tt && k - s[i] * v[i] > q[hh]) ++hh; // k - s[i] * v[i] 当前所需队头更新的最小值
+    			if(hh <= tt) dp[k] = max(dp[k],g[q[hh]] + (k - q[hh]) / v[i] * w[i]); //更新值 （k - q[hh]) / v[i] <= s[i]
+    			while(hh <= tt && g[q[tt]] - (q[tt] - j) / v[i] * w[i] <= g[k] - (k - j) / v[i] * w[i]) --tt; //更新值比它小的
     			q[++tt] = k;
 			}
 		}
