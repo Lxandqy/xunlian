@@ -1,0 +1,38 @@
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+
+const int N = 15;
+int a[N][N],dp[2 * N][N][N];
+
+int main(){
+    int n;
+    cin >> n;
+    
+    int x,y,w;
+    while(cin >> x >> y >> w){
+        if(x + y + w == 0) break;
+        a[x][y] = w;
+    }
+    
+    for(int i = 2; i <= n + n; i++){//i表示 路径走过的路
+        for(int i1 = 1; i1 <= n; i1++){//第一条路的坐标
+            for(int i2 = 1; i2 <= n; i2++){//第二条路的坐标
+                int j1 = i - i1,j2 = i - i2;
+                int &x = dp[i][i1][i2];
+                int sum = a[i1][j1];
+                if(j1 >= 1 && j1 <= n && j2 >= 1 && j2 <= n){
+                    if(i1 != i2) sum += a[i2][j2];
+                    x = max(x,dp[i - 1][i1 - 1][i2 - 1] + sum); //第一条路向下到 i1,j1 第二条路也向下到 i2,j2的情况
+                    x = max(x,dp[i - 1][i1][i2 - 1] + sum);
+                    x = max(x,dp[i - 1][i1 - 1][i2] + sum);
+                    x = max(x,dp[i - 1][i1][i2] + sum);
+                }
+            }
+        }
+    }
+    cout << dp[n + n][n][n] << endl;
+    
+    
+}
