@@ -1,0 +1,65 @@
+#include<iostream>
+
+using namespace std;
+
+const int N = 60;
+
+int a[N],n;
+int up[N],down[N];
+
+bool dfs(int depth,int u,int su,int sd){
+	if(su + sd > depth) return false;
+	if(u == n) return true;
+	
+	bool flag = false;
+	for(int i = 1; i <= su; i++){
+		if(a[u] > up[i]){
+			int h = up[i];
+			up[i] = a[u];
+			flag = true;
+			if(dfs(depth,u + 1,su,sd)) return true;
+			up[i] = h;
+			break;
+		}
+	}
+	
+	if(!flag){
+		up[su + 1] = a[u];
+		if(dfs(depth,u + 1,su + 1,sd)) return true;
+	}
+	
+	flag = false;
+	for(int i = 1; i <= sd; i++){
+		if(a[u] < down[i]){
+			int h = down[i];
+			down[i] = a[u];
+			flag = true;
+			if(dfs(depth,u + 1,su,sd)) return true;
+			down[i] = h;
+			break;
+		}
+	}
+	
+	if(!flag){
+		down[sd + 1] = a[u];
+		if(dfs(depth,u + 1,su,sd + 1)) return true;
+	}
+	
+	return false;
+}
+
+int main(){
+	while(cin >> n && n){
+		for(int i = 1; i <= n; i++){
+			cin >> a[i];
+		}
+		
+		int depth = 1;
+		while(!dfs(depth,1,0,0)) depth++;
+		cout << depth << endl;
+	}
+	
+	
+	
+	return 0;
+}
