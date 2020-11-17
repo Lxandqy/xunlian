@@ -1,0 +1,88 @@
+#include<iostream>
+#include<cstring>
+#include<algorithm>
+#include<cstdio> 
+
+using namespace std;
+const int N = 205, M = 900;
+int a[N],b[N],s[N],d[N],dp[N][M],path[N][M];
+int out[N];
+
+bool had_walk(int x,int y,int z){
+	while(x > 0 && path[x][y] != z){
+		if(path[x][y] == 0) return false;
+		y -= s[path[x][y]];
+		--x;
+	}
+	if(x == 0) return false;
+	return true;
+}
+
+int main(){
+	int n,m;
+	int cnt = 0;
+	while(cin >> n >> m && n && m){
+		
+		for(int i = 1; i <= n; i++){
+			cin >> a[i] >> b[i];
+			s[i] = b[i] - a[i];
+			d[i] = a[i] + b[i];
+		}
+		
+		memset(dp,-0x3f,sizeof dp);
+		memset(path,0,sizeof path);
+		int maxscore = 20 * m * 2;
+		dp[0][maxscore / 2] = 0;
+		for(int i = 1; i <= m; i++){
+			for(int j = 0; j <= maxscore; j++){
+				for(int k = 1; k <= n; k++){
+					int temp = j - s[k];
+					if(temp >= 0 && temp <= maxscore && dp[i - 1][temp] + d[k] > dp[i][j] && !had_walk(i - 1,temp,k)){
+						dp[i][j] = dp[i - 1][temp] + d[k];
+						path[i][j] = k;
+					} 
+				}
+			}
+		}
+		
+		int i;
+		for(i = 0; i <= maxscore / 2; i++){
+			if(dp[m][maxscore / 2 - i] >= 0 || dp[m][maxscore / 2 + i] >= 0){
+				break;
+			}
+		}
+		//j 表示 a[i] - b[i];
+		//dp[i][j] 表示 a[i] + b[i] 
+		
+		int hh,dd,g;
+		if(dp[m][maxscore / 2 - i] > dp[m][maxscore / 2 + i]){
+			g = maxscore / 2 - i;
+			hh = (dp[m][maxscore / 2 - i] - i) / 2;
+			dd = (dp[m][maxscore / 2 - i] + i) / 2;
+		}else{
+			g = maxscore / 2 + i;
+			hh = (dp[m][maxscore / 2 + i] + i) / 2;
+			dd = (dp[m][maxscore / 2 + i] - i) / 2;
+		}
+		
+		printf("Jury #%d\n",++cnt);
+		printf("Best jury has value %d for prosecution and value %d for defence: \n",dd,hh);
+		
+		int ans = 0;
+		for(int j = 0; j < m; j++){
+			int ss = path[m - j][g];
+			out[++ans] = ss;
+			g -= s[path[m - j][g]];
+		}
+		
+		sort(out + 1,out + 1 + ans);
+		
+		for(int i = 1; i <= ans; i++){
+			cout << " " << out[i];
+		}
+		cout << endl;
+		
+	}
+	
+	return 0;
+}
