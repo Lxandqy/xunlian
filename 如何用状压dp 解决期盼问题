@@ -1,0 +1,67 @@
+/* 重要思想就是先枚举出可用的情况
+将可用的情况装入容器中最后dp出来/
+
+
+#include<iostream>
+#include<vector>
+
+using namespace std;
+
+const int N = 12, M = 1 << 11, K = N * N;
+long long dp[N][M][K];
+
+vector<int>state;
+vector<int>head[M];
+int n,m,cnt[M];
+
+bool check(int x){
+    for(int i = 0; i < n; i++){
+        if((x >> i) & 1 && (x >> (i + 1)) & 1) return false;
+    }
+    return true;
+}
+
+int count(int x){
+    int sum = 0;
+    for(int i = 0; i < n; i++){
+        if((x >> i) & 1) sum++;
+    }
+    return sum;
+}
+
+
+int main(){
+	cin >> n >> m;
+	
+	for(int i = 0; i < 1 << n; i++){
+	    if(check(i)){
+	        state.push_back(i);
+	        cnt[i] = count(i);
+	    }
+	}
+	
+	for(int i = 0; i < state.size(); i++){
+	    for(int j = 0; j < state.size(); j++){
+	        if((state[i] & state[j]) == 0 && check((state[i] | state[j]))){
+	            head[i].push_back(j);
+	        }
+	    }
+	}
+	
+	dp[0][0][0] = 1;
+	for(int i = 1; i <= n + 1; i++){
+	    for(int j = 0; j <= m; j++){
+	        for(int a = 0; a < state.size(); a++){
+	            for(int b : head[a]){
+	                int c = cnt[state[a]];
+	                if(j >= c){
+	                    dp[i][j][a] += dp[i - 1][j - c][b];
+	                }
+	            }
+	        }
+	    }
+	}
+	cout << dp[n + 1][m][0] << endl;
+	
+	return 0;
+}
