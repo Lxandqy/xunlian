@@ -1,0 +1,118 @@
+#include<iostream>
+#include<queue>
+#include<cstring>
+#include<vector> 
+
+using namespace std;
+
+#define x first
+#define y second
+typedef pair<int,int> pii;
+
+const int N = 25010,M = 150010,INF = 0x3f3f3f3f;
+int head[N],last[M],to[M],w[M],cnt;
+int T,R,P,S;
+
+void add(int a,int b,int c){
+	to[++cnt] = b;
+	w[cnt] = c;
+	last[cnt] = head[a];
+	head[a] = cnt;
+}
+
+int bcnt[N];//隶属于哪个连通块
+vector<int>v[N];//连通块里有哪些点
+int flag[N],ans;
+void dfs(int x,int id){
+	v[id].push_back(x);
+	bcnt[x] = id;
+	
+	for(int i = head[x]; i != -1; i = last[i]){
+		if(!bcnt[to[i]]) dfs(to[i],id);
+	}
+	
+} 
+
+int toop[N];
+queue<int>q;
+int dist[N],st[N];
+
+void dij(int s){
+	
+	priority_queue<pii,vector<pii>,greater<pii> > heap;
+	
+	for(int i = 0; i < v[s].size(); i++){
+		heap.push({dist[v[s][i]],v[s][i]});
+	}
+	
+	while(heap.size()){
+		pii p = heap.top();
+		heap.pop();
+		
+		if(!st[p.y]) st[p.y] = 1;
+		else continue;
+		
+		for(int i = head[p.y]; i != -1; i = last[i]){
+			if(dist[to[i]] > dist[p.y] + w[i]){
+				dist[to[i]] = dist[p.y] + w[i];
+				if(bcnt[to[i]] == bcnt[p.y]){
+					heap.push({dist[to[i]],to[i]});
+				}
+			}
+			if(bcnt[to[i]] != bcnt[p.y]){
+				toop[bcnt[to[i]]]--;
+				if(toop[bcnt[to[i]]] == 0){
+					q.push(bcnt[to[i]]);
+				}
+			}
+		}
+		
+	}
+}
+
+void toopsort(){
+	memset(dist,0x3f,sizeof dist);
+	dist[S] = 0;
+	for(int i = 1; i <= ans; i++){
+		if(toop[i] == 0){
+			q.push(i);
+		}
+	}
+	while(q.size()){
+		int p = q.front();
+		q.pop();
+		dij(p);
+	}
+}
+
+int main(){
+	cin >> T >> R >> P >> S;
+	memset(head,-1,sizeof head);
+	for(int i = 1,x,y,z; i <= R; i++){
+		cin >> x >> y >> z;
+		add(x,y,z);
+		add(y,x,z);
+	}
+	
+	for(int i = 1; i <= T; i++){
+		if(!bcnt[i]){
+			++ans;
+			dfs(i,ans);
+		}
+	}
+	
+	for(int i = 1,x,y,z; i <= P; i++){
+		cin >> x >> y >> z;
+		add(x,y,z);
+		toop[bcnt[y]]++;
+	}
+	
+	toopsort();
+	
+	for(int i = 1; i <= T; i++){
+		if(dist[i] > INF / 2) cout << "NO PATH" << endl;
+		else cout << dist[i] << endl;
+	}
+	
+	return 0;
+}
