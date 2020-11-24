@@ -1,0 +1,66 @@
+#include<iostream>
+#include<cstring>
+#include<deque>
+#include<cstdio>
+
+using namespace std;
+const int N = 1010,M = 20010;
+int head[N],to[M],w[M],last[M],cnt;
+int n,p,k;
+void add(int a,int b,int c){
+	to[++cnt] = b;
+	w[cnt] = c;
+	last[cnt] = head[a];
+	head[a] = cnt;
+}
+
+int flag[N],dist[N];
+bool check(int bound){
+	memset(flag,0,sizeof flag);
+	memset(dist,0x3f,sizeof dist);
+	deque<int>q;
+	
+	dist[1] = 0;
+	q.push_back(1);
+	
+	while(q.size()){
+		int p = q.front();
+		q.pop_front();
+		
+		if(flag[p]) continue;
+		flag[p] = 1;
+		
+		for(int i = head[p]; i != -1; i = last[i]){
+			int ww = w[i] > bound;
+			if(dist[to[i]] > dist[p] + ww){
+				dist[to[i]] = dist[p] + ww;
+				if(!ww) q.push_front(to[i]);
+				else q.push_back(to[i]);
+			}
+		}
+	}
+	return dist[n] <= k;
+}
+
+int main(){
+	scanf("%d%d%d",&n,&p,&k);
+	int x,y,z;
+	memset(head,-1,sizeof head);
+	for(int i = 1; i <= p; i++){
+		scanf("%d%d%d",&x,&y,&z);
+		add(x,y,z);
+		add(y,x,z);
+	}
+	
+	int l = 0,r = 1e6 + 1;
+	while(l < r){
+		int mid = l + r >> 1;
+		if(check(mid)) r = mid;
+		else l = mid + 1;
+	}
+	
+	if(r == 1e6 + 1) r = -1;
+	cout << r << endl;	
+	
+	return 0;
+}
