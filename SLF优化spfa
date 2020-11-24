@@ -1,0 +1,78 @@
+/*但是SLF优化,不同于一般的SPFA算法,它是一种利用双端队列算法处理的问题.
+
+如果说当前点所花费的值少于我们当前队头点的值的话,那么我们就将这个节点插入到队头去,否则我们还是插入到队尾.
+
+这个就是非常好用的SLF优化算法.*/
+
+
+
+#include<iostream>
+#include<deque>
+#include<cstring>
+
+using namespace std;
+
+const int N = 400005,M = 400010;
+int T,R,P,S;
+int head[N],last[M],to[M],w[M],cnt,H[N];
+void add(int a,int b,int c){
+	to[++cnt] = b;
+	w[cnt] = c;
+	last[cnt] = head[a];
+	head[a] = cnt;
+}
+
+int flag[N],dist[N];
+void spfa(){
+	memset(flag,0,sizeof flag);
+	memset(dist,0x3f,sizeof dist);
+	deque<int>q;
+	q.push_back(S);
+	dist[S] = 0;
+	while(q.size()){
+		int p = q.front();
+		q.pop_front();
+		flag[p] = 0;
+		for(int i = head[p]; i != -1; i = last[i]){
+			if(dist[to[i]] > dist[p] + w[i]){
+				dist[to[i]] = dist[p] + w[i];
+				if(!flag[to[i]]){
+					flag[to[i]] = 1;
+					if(q.size() && dist[q.front()] > dist[to[i]]){
+						q.push_front(to[i]);
+					}else{
+						q.push_back(to[i]);
+					}
+				}
+			}
+		}
+	}
+} 
+
+int main(){
+	memset(head,-1,sizeof head);
+	scanf("%d%d%d%d",&T,&R,&P,&S);
+	for(int i = 1,x,y,z; i <= R; i++){
+		scanf("%d%d%d",&x,&y,&z);
+		add(x,y,z);
+		add(y,x,z);
+	}
+	
+	for(int i = 1,x,y,z; i <= P; i++){
+		scanf("%d%d%d",&x,&y,&z);
+		add(x,y,z);
+	}
+	
+	spfa();
+	
+	for(int i = 1; i <= T; i++){
+		if(dist[i] == 0x3f3f3f3f){
+			printf("NO PATH\n");
+		}else printf("%d\n",dist[i]);
+	}
+	
+	
+	
+	
+	return 0;
+}
