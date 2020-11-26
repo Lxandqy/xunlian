@@ -1,3 +1,7 @@
+//dp[i] - dp[j] >= i - j;
+//dp[i] - i >= dp[j] - j;
+//输入偏移往左i 即只要求dp[i] >= dp[j] 即求 最长不下降子序列
+
 
 #include<iostream>
 #include<cstring>
