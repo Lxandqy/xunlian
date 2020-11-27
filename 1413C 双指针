@@ -1,0 +1,57 @@
+/*题目大意就 用a[1~6] + x 生成的 b[1~n] 求 min(maxX - minX);
+思路是用双指针 确定一个最小值 遍历后面的最大值;
+
+
+#include<iostream>
+#include<algorithm>
+
+using namespace std;
+
+const int N = 1e5 + 10;
+struct node{
+	int id,val;
+	bool operator <(node a)const{
+		return val < a.val;
+	}
+}b[N * 6];
+int n;
+int a[N],st[N];
+
+int main(){
+	for(int i = 1; i <= 6; i++){
+		cin >> a[i];
+	}
+	
+	int cnt = 0;
+	cin >> n;
+	for(int i = 1,s; i <= n; i++){
+		cin >> s;
+		for(int j = 1; j <= 6; j++){
+			b[++cnt].id = i;
+			b[cnt].val = s - a[j];
+		}
+	}
+	
+	sort(b + 1,b + cnt + 1);
+	
+	int j = 1,ans = 0x3f3f3f3f,num = 0;
+	for(int i = 1; i <= cnt; i++){
+		
+		while(j <= cnt && num < n){
+			st[b[j].id]++;
+			if(st[b[j].id] == 1) num++;
+			j++;
+		}
+		
+		if(num == n){
+			ans = min(ans,b[j - 1].val - b[i].val);
+		}
+		
+		st[b[i].id]--;
+		if(st[b[i].id] == 0) num--;
+	}
+	
+	cout << ans << endl;
+	
+	return 0;
+}
