@@ -1,0 +1,81 @@
+//思路 比如 1 - 3这条路径是 要求的路径 那就只要求出与1相连除了3的点的 个数 s1,与 3相连的除了1的点的个数 s2  经过1-3这条边的总次数即为 s1 * s2; Cs1 1 * Cs2 1;
+
+
+#include<iostream>
+#include<cstring>
+#include<algorithm>
+
+using namespace std;
+typedef long long ll;
+const int N = 2e5 + 10, mod = 1e9 + 7, M = 6 * 1e4 + 10;
+int a[N],b[N]; ll prime[M];
+int n,m;
+
+ll head[N],to[N],last[N],cnt;
+void add(int a,int b){
+	to[++cnt] = b;
+	last[cnt] = head[a];
+	head[a] = cnt;
+}
+
+ll dis[N],coutt[N],ans;
+void dfs(int x,int last1){
+	dis[x] = 1;
+	for(int i = head[x]; i != -1; i = last[i]){
+		if(to[i] == last1) continue;
+		dfs(to[i],x);
+		dis[x] = dis[x] + dis[to[i]];
+		coutt[++ans] = dis[to[i]] * (n - dis[to[i]]);
+	}
+}
+int main(){
+	int t;
+	cin >> t;
+	while(t--){
+		cnt = 0;
+		ans = 0;
+		memset(dis,0,sizeof dis);
+		memset(head,-1,sizeof head);
+		memset(coutt,0,sizeof coutt);
+		scanf("%d",&n);
+		for(int i = 1,x,y; i <= n - 1; i++){
+			scanf("%d%d",&x,&y);
+			add(x,y);
+			add(y,x);
+		}
+		dfs(1,0);
+		
+		scanf("%d",&m);
+		for(int i = 1; i <= m; i++){
+			scanf("%lld",&prime[i]);
+		}
+		
+		ll summ = 0;
+		if(m < n - 1){
+			sort(coutt + 1,coutt + ans + 1,greater<int>());
+			sort(prime + 1,prime + m + 1,greater<int>());
+			for(int i = 1; i <= ans; i++){
+				if(i > m) summ = (summ % mod + coutt[i] % mod) % mod;
+				else summ =  (summ + (ll)coutt[i] % mod * prime[i] % mod) % mod;
+			}
+		}else{
+			sort(coutt + 1,coutt + ans + 1);
+			sort(prime + 1,prime + m + 1);
+			ll h = 1;
+			for(int i = ans + 1; i <= m; i++){
+				h = (h % mod * prime[i] % mod) % mod; 
+			}
+			prime[ans] = (prime[ans] % mod * h % mod) % mod;
+			for(int i = 1; i <= ans; i++){
+				summ = (summ % mod + coutt[i] * prime[i] % mod) % mod;
+			}
+		}
+		
+		cout << summ << endl;
+		
+	}
+	
+	
+	
+	return 0;
+}
