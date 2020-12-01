@@ -1,0 +1,67 @@
+//倍增只有在符合结合律的时候才能用 就是前后左右都互不影响 是独立的
+
+
+#include<iostream>
+#include<map>
+#include<cstring>
+
+using namespace std;
+
+const int N = 210;
+
+int a[N][N],cnt;
+int n,m,S,E;
+map<int,int>mp;
+int res[N][N];
+int temp[N][N];
+
+void mul(int a[][N],int b[][N],int c[][N]){
+	memset(temp,0x3f,sizeof temp);
+	for(int k = 1; k <= cnt; k++){
+		for(int i = 1; i <= cnt; i++){
+			for(int j = 1; j <= cnt; j++){
+				temp[i][j] = min(temp[i][j],b[i][k] + c[k][j]);
+			}
+		}
+	}
+	memcpy(a,temp,sizeof temp);
+}
+
+void qmi(){
+	memset(res,0x3f,sizeof res);
+	
+	for(int i = 1; i <= cnt; i++) res[i][i] = 0;
+	
+	while(n > 0){
+		if(n & 1){
+			mul(res,res,a); // res = res * a;
+		}
+		mul(a,a,a); //a = a * a;
+		n >>= 1;
+	}
+}
+
+int main(){
+	cin >> n >> m >> S >> E; 
+	if(!mp.count(S)) mp[S] = ++cnt;
+	if(!mp.count(E)) mp[E] = ++cnt;
+	S = mp[S],E = mp[E];
+	
+	memset(a,0x3f,sizeof a);
+	for(int i = 1,x,y,z; i <= m; i++){
+		cin >> x >> y >> z;
+		if(!mp.count(y)) mp[y] = ++cnt;
+		if(!mp.count(z)) mp[z] = ++cnt;
+		y = mp[y],z = mp[z];
+		a[y][z] = a[z][y] = min(a[y][z],x);
+	}
+	
+	qmi();
+	
+	cout << res[S][E] << endl;
+	
+	
+	
+	return 0;
+}
+
