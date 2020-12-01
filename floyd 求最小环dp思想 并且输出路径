@@ -1,0 +1,70 @@
+//f[i][j] 表示i 到 j 的最短路
+
+
+
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+const int N = 110;
+int n,m;
+int a[N][N],f[N][N],g[N],d[N][N];
+int pos[N][N],out[N],cnt;
+
+void dfs(int i,int j){
+	if(pos[i][j] == 0) return;
+	dfs(i,pos[i][j]);
+	out[++cnt] = pos[i][j];
+	dfs(pos[i][j],j);
+}
+
+int main(){
+	scanf("%d%d",&n,&m);
+	
+	memset(f,0x3f,sizeof f);
+	
+	for(int i = 0; i <= n; i++) f[i][i] = 0;
+	
+	for(int i = 1,x,y,z; i <= m; i++){
+		scanf("%d%d%d",&x,&y,&z);
+		f[x][y] = min(f[x][y],z);
+		f[y][x] = min(f[y][x],z);
+	}
+	
+	memcpy(d,f,sizeof d);//copy原始图
+	long long res = 0x3f3f3f3f;
+	for(int k = 1; k <= n; k++){ // 表示每次经过第k个点的最小环 由于是从1到n更新的所以 第k个点是最大的点;
+		for(int i = 1; i < k; i++){//因为用不到k点以后的 只需求前k个点的就行
+			for(int j = i + 1; j < k; j++){
+				if(res > (long long )f[i][j] + d[i][k] + d[k][j]){
+					res = f[i][j] + d[i][k] + d[k][j]; //res 表示 i 到 j的最小值 + i到k的最小值 + k到j的最小值 因为d数组是原始数组 所以是线段不是路径 所以i到k k到j不存在经过前 k个点;
+					cnt = 0;
+					out[++cnt] = k; //记录的路径为 k -> i -> ij经过了的点 -> j -> k;
+					out[++cnt] = i;
+					dfs(i,j);
+					out[++cnt] = j;
+				}
+			}
+		}
+		for(int i = 1; i <= n; i++){
+			for(int j = 1; j <= n; j++){
+				if(f[i][j] > f[i][k] + f[k][j]){
+					f[i][j] =  min(f[i][j],f[i][k] + f[k][j]); //更新i 到 j的最小值
+					pos[i][j] = k; //更新 i 到 j 经过了的点
+				}
+				
+			}
+		}
+	}
+	
+	for(int i = 1; i <= cnt; i++){
+		if(i != 1) cout << " ";
+		cout << out[i];
+	}
+	cout << endl;
+	
+	
+	
+	
+	return 0;
+}
