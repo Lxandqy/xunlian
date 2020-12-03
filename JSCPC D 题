@@ -1,0 +1,122 @@
+//思路是 每个数去除的顺序是一样的 不会变 然后将 每个数是第几遍中的第几个记录下来
+//第一个是找x第几个去掉的 那就二分找他第几个去掉的
+//第二个是找第x个去掉的是哪个 那就前缀和
+
+
+#include<iostream>
+#include<vector>
+#include<cstring>
+
+using namespace std;
+
+const int N = 1e6 + 10,M = 110010;
+int a[N];
+int n,k;
+int prime[N],mprime[N],cnt;
+int num[110],b[110][M];
+int belong[N];
+int qzh[110][N];
+int flag[N];
+void isprime(){
+	for(int i = 2; i <= N - 1; i++){
+		if(!flag[i]){
+			flag[i] = 1;
+			prime[++cnt] = i;
+			mprime[i] = cnt;
+		}
+		for(int j = 1; i * prime[j] <= N - 1; j++){
+			flag[i * prime[j]] = 1;
+			if(i % prime[j] == 0) break;
+		}
+	}
+}
+
+int v1[N],v2[N];
+void get_array(){
+	
+	isprime();
+	
+	int fi = 1e6,se = 0;
+	for(int i = 1; i <= 1e6; i++){
+		v1[i] = i;
+	}
+	int s = 1e6,flag = 1,h = 0,tt = 0;
+	while(s != 0){
+		++h;tt = 0;
+		if(flag){
+			for(int i = 1; i <= fi; i++){
+				if(!mprime[i] && i != 1){
+					v2[++se] = v1[i];
+				}
+				else{
+					belong[v1[i]] = h;
+					b[h][++tt] = v1[i];
+					num[h] = tt;
+					s--;
+				}
+			}
+			fi = 0;
+			flag = 0;
+		}else{
+			for(int i = 1; i <= se; i++){
+				if(!mprime[i] && i != 1){
+					v1[++fi] = v2[i];
+				}
+				else{
+					s--;
+					belong[v2[i]] = h;
+					b[h][++tt] = v2[i];
+					num[h] = tt;
+				}
+			}
+			se = 0;
+			flag = 1;
+		}
+	}
+	
+	for(int i = 1; i <= N; i++){
+		for(int j = 1; j <= 81; j++){
+			if(belong[i] == j){
+				qzh[j][i] = qzh[j][i - 1] + 1;
+			}else qzh[j][i] = qzh[j][i - 1];
+		}
+	}
+	
+}
+
+int main(){
+	get_array();
+	int t;
+	cin >> t;
+	while(t--){
+		int tt;
+		scanf("%d%d%d",&tt,&n,&k);
+		
+		if(tt == 1){
+			int sum = 0;
+			for(int i = 1; i <= 81; i++){
+				int pos = lower_bound(b[i] + 1,b[i] + num[i] + 1,k) - b[i];
+				if(b[i][pos] == k){
+					cout << sum + pos << endl;
+					break;
+				}else sum += qzh[i][n];
+			}
+		}else{
+			int sum = 0;
+			for(int i = 1; i <= 81; i++){
+				if(sum + qzh[i][n] < k){
+					sum += qzh[i][n];
+				}else{
+					cout << b[i][k - sum] << endl;
+					break;
+				}
+			}
+		}
+		
+		
+	}
+	
+	
+	
+	return 0;
+}
