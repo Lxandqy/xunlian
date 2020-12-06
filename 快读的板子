@@ -1,0 +1,27 @@
+template<typename T>void read(T &res) {
+	bool flag=false;
+	char ch;
+	while(!isdigit(ch=getchar()))
+		(ch=='-')&&(flag=true);
+	for(res=ch-48;isdigit(ch=getchar());
+	res=(res<<1)+(res<<3)+ch - 48);
+	flag&&(res=-res);
+}
+
+
+多组输入的快读
+void read() {}
+template<typename T,typename... T2>inline void read(T &x,T2 &... oth) {
+	x=0;
+	int ch=getchar(),f=0;
+	while(ch<'0'||ch>'9') {
+		if (ch=='-') f=1;
+		ch=getchar();
+	}
+	while(ch>='0'&&ch<='9') {
+		x=(x<<1)+(x<<3)+(ch^48);
+		ch=getchar();
+	}
+	if(f)x=-x;
+	read(oth...);
+}
