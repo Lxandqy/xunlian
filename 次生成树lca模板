@@ -1,0 +1,156 @@
+#include<iostream>
+#include<algorithm>
+#include<cstring>
+
+using namespace std;
+
+typedef long long LL;
+
+const int N = 1e5 + 10,M = 3e5 + 10;
+int n,m;
+
+int head[N],to[M << 1],w[M << 1],last[M << 1],cnt;
+void add(int a,int b,int c){
+	to[++cnt] = b;
+	w[cnt] = c;
+	last[cnt] = head[a];
+	head[a] = cnt;
+}
+
+struct node{
+	int x,y,w,use;
+	bool operator <(const node &p)const{
+		return w < p.w;
+	}
+}a[M];
+
+int fa[N],lg[N];
+void init(){
+	for(int i = 1; i <= N; i++){
+		head[i] = -1;
+		fa[i] = i;
+		lg[i] = lg[i - 1] + ((1 << lg[i - 1]) == i);
+	}
+}
+
+int get(int x){
+	if(fa[x] == x) return x;
+	return fa[x] = get(fa[x]);
+}
+
+LL kusal(){
+	LL sum = 0;
+	for(int i = 1; i <= m; i++){
+		int x = get(a[i].x),y = get(a[i].y);
+		if(x != y){
+			fa[x] = y;
+			a[i].use = 1;
+			sum += a[i].w;
+			add(a[i].x,a[i].y,a[i].w);
+			add(a[i].y,a[i].x,a[i].w);
+		}
+	}
+	return sum;
+}
+
+int fat[N][25],depth[N],dist[N],d1[N][25],d2[N][25],q[N];
+void bfs(){
+	memset(depth,0x3f,sizeof depth);
+	depth[0] = 0,depth[1] = 1;
+	int hh = 0,tt = 0;
+	q[0] = 1;
+	while(hh <= tt){
+		int p = q[hh++];
+		for(int i = head[p]; i != -1; i = last[i]){
+			int j = to[i];
+			if(depth[j] > depth[p] + 1){
+				depth[j] = depth[p] + 1;
+				q[++tt] = j;
+				fat[j][0] = p;
+				d1[j][0] = w[i],d2[j][0] = -0x3f3f3f3f;
+				for(int k = 1; k <= 16; k++){
+					int anc = fat[j][k - 1];
+					fat[j][k] = fat[anc][k - 1];
+					int distance[4] = {d1[j][k - 1],d2[j][k - 1],d1[anc][k - 1],d2[anc][k - 1]};
+					d1[j][k] = d2[j][k] = -0x3f3f3f3f; 
+					for(int u = 0; u < 4; u++){
+						int d = distance[u];
+						if(d > d1[j][k]){
+							d2[j][k] = d1[j][k];
+							d1[j][k] = d;
+						}else if(d < d1[j][k] && d > d2[j][k]){
+							d2[j][k] = d;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+int lca(int x,int y,int w){
+	static int distance[N * 2];
+	int ans = 0;
+	if(depth[x] < depth[y]) swap(x,y);
+	for(int k = 16; k >= 0; k--){
+		if(depth[fat[x][k]] >= depth[y]){
+			distance[++ans] = d1[x][k];
+			distance[++ans] = d2[x][k];
+			x = fat[x][k];
+		}
+	}
+	
+	if(x != y){
+		for(int k = 16; k >= 0; k--){
+			if(fat[x][k] != fat[y][k]){
+				distance[++ans] = d1[x][k];
+				distance[++ans] = d2[x][k];
+				distance[++ans] = d1[y][k];
+				distance[++ans] = d2[y][k];
+				x = fat[x][k],y = fat[y][k];
+			}
+		}
+		distance[++ans] = d1[x][0];
+		distance[++ans] = d1[y][0];
+	}
+	
+	int g1 = -0x3f3f3f3f,g2 = -0x3f3f3f3f;
+	for(int i = 1; i <= ans; i++){
+		int d = distance[i];
+		if(d > g1){
+			g2 = g1;
+			g1 = d;
+		}else if(d < g1 && d > g2){
+			g2 = d;
+		}
+	}
+	if(w > g1) return w - g1;
+	if(w > g2) return w - g2;
+	return 0x3f3f3f3f;
+}
+
+int main(){
+	init();
+	ios::sync_with_stdio(false);
+	cin >> n >> m;
+	for(int i = 1,x,y,z; i <= m; i++){
+		cin >> x >> y >> z;
+		a[i].x = x,a[i].y = y,a[i].w = z;
+	} 
+	
+	sort(a + 1,a + m + 1);
+	
+	LL sum = kusal();
+	bfs();
+	
+	LL res = 1e18;
+	for(int i = 1; i <= m; i++){
+		if(!a[i].use){
+			int x = a[i].x,y = a[i].y;
+			res = min(res,sum + lca(x,y,a[i].w));
+		}
+	}
+	
+	printf("%lld\n",res);
+	return 0;
+}
