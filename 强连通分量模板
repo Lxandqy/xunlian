@@ -1,0 +1,75 @@
+#include<iostream>
+#include<cstring> 
+
+using namespace std;
+
+const int N = 1e4 + 10,M = 5e4 + 10;
+int n,m;
+int head[N],to[M],last[M],cnt;
+void add(int a,int b){
+	to[++cnt] = b;
+	last[cnt] = head[a];
+	head[a] = cnt;
+}
+
+int toopc[N];
+int dfn[N],low[N],timee,st[N],flag[N],scc_cnt,id[N],st_size[N],top;
+void tarjan(int x){
+	dfn[x] = low[x] = ++timee; // 时间戳
+	st[++top] = x,flag[x] = 1; //入栈 和 有无入栈
+	for(int i = head[x]; i != -1; i = last[i]){
+		int j = to[i];
+		if(!dfn[j]){
+			tarjan(j);
+			low[x] = min(low[x],low[j]); 
+		}else if(dfn[j] && flag[j]){
+			low[x] = min(low[x],dfn[j]);
+		}
+	}
+	if(dfn[x] == low[x]){
+		++scc_cnt; //多了一个强连通分量； 多了一个环
+		int y;
+		do{
+			y = st[top--]; //将这强连通分量的点全都出栈并且标记 他们全都属于这个强连通分量里面
+			id[y] = scc_cnt;
+			flag[y] = 0;
+			st_size[scc_cnt]++;
+		}while(y != x);
+	}
+}
+
+int main(){
+	memset(head,-1,sizeof head);
+	cin >> n >> m;
+	for(int i = 1; i <= m; i++){
+		int x,y;
+		cin >> x >> y;
+		add(x,y);
+	}
+	
+	for(int i = 1; i <= n; i++){
+		if(!dfn[i]) tarjan(i);
+	}
+	
+	for(int i = 1; i <= n; i++){
+		for(int j = head[i]; j != -1; j = last[j]){
+			int k = to[j];
+			int a = id[i],b = id[k];
+			if(a != b) toopc[a]++; // 这个联通分量 和另一个 分量的关系
+		}
+	}
+	
+	int zeros = 0,sum = 0;
+	for(int i = 1; i <= scc_cnt; i++){
+		if(!toopc[i]){ 
+			zeros++;
+			sum += st_size[i];
+			if(zeros > 1){
+				sum = 0;
+				break;
+			}
+		}
+	}
+	cout << sum << endl;
+	return 0;
+}
