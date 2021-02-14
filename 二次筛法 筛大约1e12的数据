@@ -1,0 +1,80 @@
+// 如果题目给出数据l ，r 最优断电数据差不超过1e6可用
+//利用 0~sqrt(r) 必定质数的知识 将 l ~ r的 合数都给筛去 剩下的就都是质数了
+
+#include<iostream>
+#include<cmath>
+#include<cstring>
+
+using namespace std;
+
+const int N = 1e6 + 10;
+
+int prime[N],flag[N],cnt;
+
+typedef long long ll;
+
+void is_prime(){
+	for(int i = 2; i <= N - 1; i++){
+		if(!flag[i]){
+			flag[i] = 1;
+			prime[++cnt] = i;
+		}
+		for(int j = 1; i * prime[j] <= N - 1; j++){
+			flag[i * prime[j]] = 1;
+			if(i % prime[j] == 0){
+				break;
+			}
+		}
+	}
+}
+
+int main(){
+	
+	is_prime();
+	ll l,r;
+	while(cin >> l >> r){
+		memset(flag,0,sizeof flag);
+		if(l == 1) flag[0] = 1;
+		for(int i = 1; i <= cnt; i++){
+			int p = prime[i];
+			if(sqrt(r) < prime[i]) break;
+			for(ll j = max((l + p - 1) / p * p,2ll * p); j <= r; j += p){ //将l ~ r中 p的倍数全给筛去
+				flag[j - l] = 1;
+			}
+		}
+		ll maxn = 0,minn = 1e9;
+		ll s1 = -1,s2 = -1;
+		
+		ll last = -1;
+		for(ll i = l; i <= r; i++){
+			if(!flag[i - l]){
+				if(last == -1){
+					last = i;
+					continue;
+				}else{
+					if(maxn < i - last){
+						maxn = i - last;
+						s1 = i;
+					}
+					if(minn > i - last){
+						minn = i - last;
+						s2 = i;
+					}
+					last = i;
+				}
+			}
+		}
+		
+		if(s1 == -1 && s2 == -1){
+			printf("There are no adjacent primes.\n");
+		}else{
+			printf("%d,%d are closest, %d,%d are most distant.\n",s2 - minn,s2,s1 - maxn,s1);
+		}
+	}
+	
+	
+	
+	
+	
+	return 0;
+}
