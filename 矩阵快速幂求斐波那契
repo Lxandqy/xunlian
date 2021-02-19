@@ -15,7 +15,8 @@ void muti(ll a[][3],ll b[][3]){
 	ll temp[3][3] = {0};
 	for(int i = 1; i <= 2; i++){
 		for(int j = 1; j <= 2; j++){
-			temp[i][1] += a[j][1] * b[i][j];
+			temp[i][1] += a[j][1] * b[i][j] % m;
+			temp[i][1] %= m;
 		}
 	}
 	for(int i = 1; i <= 2; i++){
@@ -28,7 +29,7 @@ void mutic(ll a[][3],ll b[][3]){
 	for(int i = 1; i <= 2; i++){
 		for(int j = 1; j <= 2; j++){
 			for(int k = 1; k <= 2; k++){
-				temp[i][j] += a[i][k] * b[j][k];
+				temp[i][j] += a[i][k] * b[k][j];
 				temp[i][j] %= m;
 			}
 		}
